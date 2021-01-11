@@ -4,12 +4,17 @@ import "./style.css"
 
 const AppContext = React.createContext(null)
 
-console.log("ok!")
-
 function  App() {
 	const [value, setValue] = useState(0)
 	const [secondary, setSecondary] = useState(null)
 	const [operation, setOp] = useState(null)
+	const [base, setBase] = useState("DEC")
+	function acceptable(){
+		if(value != "Invalid format" && base == "DEC")
+			return true
+		else
+			return false
+	}
 	function factorial(n){
 		if(n == 0 || n == 1)
 		return 1
@@ -77,29 +82,26 @@ function  App() {
 	}
 	function invalid(){
 		setValue("Invalid format")
-	}
-	function increse(){
-		if(value != "Invalid format")
-		setValue(value + 1)
+		setBase("DEC")
 	}
 	function Power2(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.pow(2, value))
 	}
 	function Power10(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.pow(10, value))
 	}
 	function Exp(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.pow(Math.E, value))
 	}
 	function NaturalL(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.log(value))
 	}
 	function LogBase(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("log")
@@ -111,9 +113,10 @@ function  App() {
 		setValue(0)
 		setSecondary(null)
 		setOp(null)
+		setBase("DEC")
 	}
 	function Power(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("pow")
@@ -122,7 +125,7 @@ function  App() {
 		}
 	}
 	function Root(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("root")
@@ -131,19 +134,19 @@ function  App() {
 		}
 	}
 	function Square(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(value * value)
 	}
 	function SquareRoot(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.sqrt(value))
 	}
 	function Inverse(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(1/value)
 	}
 	function Fraction(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("div")
@@ -152,7 +155,7 @@ function  App() {
 		}
 	}
 	function BinomialCox(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("BC")
@@ -161,15 +164,17 @@ function  App() {
 		}
 	}
 	function Number(n){
-		if(value == 0 || value == "Invalid format")
-		setValue(n)
-		else if (value > 0)
-			setValue(n + value*10)
-		else
-			setValue(value*10 - n)
+		if(base == "DEC"){
+			if(value == 0 || value == "Invalid format")
+			setValue(n)
+			else if (value > 0)
+				setValue(n + value*10)
+			else
+				setValue(value*10 - n)
+		}
 	}
 	function Multi(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("multiplication")
@@ -178,15 +183,15 @@ function  App() {
 		}
 	}
 	function Sinus(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.sin(value))
 	}
 	function ArchSinus(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.asin(value))
 	}
 	function Sub(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("sub")
@@ -195,15 +200,15 @@ function  App() {
 		}
 	}
 	function Cosinus(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.cos(value))
 	}
 	function ArchCosinus(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.acos(value))
 	}
 	function Plus(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("plus")
@@ -212,19 +217,19 @@ function  App() {
 		}
 	}
 	function Tangent(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.tan(value))
 	}
 	function ArchTangent(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(Math.atan(value))
 	}
 	function Opposite(){
-		if(value != "Invalid format")
+		if(acceptable())
 		setValue(-value)
 	}
 	function Module(){
-		if(value == "Invalid format")
+		if(!acceptable())
 		invalid()
 		else{
 			setOp("mod")
@@ -232,18 +237,227 @@ function  App() {
 			setValue(0)
 		}
 	}
-
-
+	function toDecimal(){
+		let res = 0
+		switch(base){
+			case "DEC":{
+				return
+			}
+			case "BIN":{
+				let num = value
+				let ind = 0
+				while(num > 0){
+					let last = num%10
+					res += Math.pow(2, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				setBase("DEC")
+				setValue(res)
+				return
+			}
+			case "OCT":{
+				let num = value
+				let ind = 0
+				while(num > 0){
+					let last = num%10
+					res += Math.pow(8, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				setBase("DEC")
+				setValue(res)
+				return
+			}
+			case "HEX":{
+				res = parseInt(value, 16)
+				setBase("DEC")
+				setValue(res)
+			}
+		}
+	}
+	function toBinary(){
+		let res = 0
+		switch(base){
+			case "DEC":{
+				let digits = []
+				let num = value
+				while(num > 0){
+					digits.push(num%2)
+					num = Math.floor(num/2)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("BIN")
+				setValue(res)
+				return
+			}
+			case "BIN":{
+				return
+			}
+			case "OCT":{
+				let num = value
+				let ind = 0
+				let dec = 0
+				while(num > 0){
+					let last = num%10
+					dec += Math.pow(8, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				let digits = []
+				while(dec > 0){
+					digits.push(dec%2)
+					dec = Math.floor(dec/2)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("BIN")
+				setValue(res)
+				return
+			}
+			case "HEX":{
+				let dec = parseInt(value, 16)
+				let digits = []
+				while(dec > 0){
+					digits.push(dec%2)
+					dec = Math.floor(dec/2)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("BIN")
+				setValue(res)
+				return
+			}
+		}
+	}
+	function toOctal(){
+		let res = 0
+		switch(base){
+			case "DEC":{
+				let digits = []
+				let num = value
+				while(num > 0){
+					digits.push(num%8)
+					num = Math.floor(num/8)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("OCT")
+				setValue(res)
+				return
+			}
+			case "BIN":{
+				let num = value
+				let ind = 0
+				let dec = 0
+				while(num > 0){
+					let last = num%10
+					dec += Math.pow(2, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				let digits = []
+				while(dec > 0){
+					digits.push(dec%8)
+					dec = Math.floor(dec/8)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("OCT")
+				setValue(res)
+				return
+			}
+			case "OCT":{
+				return
+			}
+			case "HEX":{
+				let dec = parseInt(value, 16)
+				let digits = []
+				while(dec > 0){
+					digits.push(dec%8)
+					dec = Math.floor(dec/8)
+				}
+				for(let i = digits.length - 1; i >= 0; i--){
+					res = res + digits[i]
+					if (i != 0)
+					res = res * 10
+				}
+				setBase("OCT")
+				setValue(res)
+				return
+			}
+		}
+	}
+	function toHexadecimal(){
+		let res = ""
+		switch(base){
+			case "DEC":{
+				res = value.toString(16)
+				setBase("HEX")
+				setValue(res)
+				return
+			}
+			case "BIN":{
+				let num = value
+				let ind = 0
+				let dec = 0
+				while(num > 0){
+					let last = num%10
+					dec += Math.pow(2, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				res = dec.toString(16)
+				setBase("HEX")
+				setValue(res)
+				return
+			}
+			case "OCT":{
+				let num = value
+				let ind = 0
+				let dec = 0
+				while(num > 0){
+					let last = num%10
+					dec += Math.pow(8, ind)*last
+					ind++
+					num = Math.floor(num/10)
+				}
+				res = dec.toString(16)
+				setBase("HEX")
+				setValue(res)
+				return
+			}
+			case "HEX":{
+				return
+			}
+		}
+	}
 	return (
 		<div className = "App">
 			<AppContext.Provider value={value}>
-				<Display testo={"Y = "}/>
+				<Display testo={"X = "}/>
 			</AppContext.Provider>
 			<AppContext.Provider value={operation}>
 				<Display testo={"Function: "}/>
 			</AppContext.Provider>
 			<AppContext.Provider value={secondary}>
-				<Display testo={"X = "}/>
+				<Display testo={"Y = "}/>
 			</AppContext.Provider>
 			<br></br>
 
@@ -259,7 +473,7 @@ function  App() {
 			<AppContext.Provider value={"ln(X)"}>
 				<button onClick={()=>{NaturalL()}}><Buttons/></button>
 			</AppContext.Provider>
-			<AppContext.Provider value={"logX(Y)"}>
+			<AppContext.Provider value={"logY(X)"}>
 				<button onClick={()=>{LogBase()}}><Buttons/></button>
 			</AppContext.Provider>
 			<AppContext.Provider value={"CANCEL"}>
@@ -268,10 +482,10 @@ function  App() {
 
 			<br></br>
 
-			<AppContext.Provider value={"X^Y"}>
+			<AppContext.Provider value={"Y^X"}>
 				<button onClick={()=>{Power()}}><Buttons/></button>
 			</AppContext.Provider>
-			<AppContext.Provider value={"Y√X"}>
+			<AppContext.Provider value={"X√Y"}>
 				<button onClick={()=>{Root()}}><Buttons/></button>
 			</AppContext.Provider>
 			<AppContext.Provider value={"X^2"}>
@@ -289,7 +503,7 @@ function  App() {
 
 			<br></br>
 
-			<AppContext.Provider value={"BC(X:Y)"}>
+			<AppContext.Provider value={"BC(Y:X)"}>
 				<button onClick={()=>{BinomialCox()}}><Buttons/></button>
 			</AppContext.Provider>
 			<AppContext.Provider value={"X!"}>
@@ -364,7 +578,7 @@ function  App() {
 			<AppContext.Provider value={"0"}>
 				<button onClick={()=>{Number(0)}}><Buttons/></button>
 			</AppContext.Provider>
-			<AppContext.Provider value={"MOD"}>
+			<AppContext.Provider value={"Y%X"}>
 				<button onClick={()=>{Module()}}><Buttons/></button>
 			</AppContext.Provider>
 			<AppContext.Provider value={"="}>
@@ -374,19 +588,23 @@ function  App() {
 			<br></br>
 
 			<AppContext.Provider value={"e"}>
-				<button onClick={()=>{setValue(Math.E)}}><Half/></button>
+				<button onClick={()=>{setValue(Math.E)}}><Buttons/></button>
+			</AppContext.Provider>
+			<AppContext.Provider value={"DEC"}>
+				<button onClick={()=>{toDecimal()}}><Buttons/></button>
+			</AppContext.Provider>
+			<AppContext.Provider value={"BIN"}>
+				<button onClick={()=>{toBinary()}}><Buttons/></button>
+			</AppContext.Provider>
+			<AppContext.Provider value={"OCT"}>
+				<button onClick={()=>{toOctal()}}><Buttons/></button>
+			</AppContext.Provider>
+			<AppContext.Provider value={"HEX"}>
+				<button onClick={()=>{toHexadecimal()}}><Buttons/></button>
 			</AppContext.Provider>
 			<AppContext.Provider value={"PI"}>
-				<button onClick={()=>{setValue(Math.PI)}}><Half/></button>
+				<button onClick={()=>{setValue(Math.PI)}}><Buttons/></button>
 			</AppContext.Provider>
-		</div>
-	)
-}
-function Half(){
-	const ctx = useContext(AppContext)
-	return (
-		<div>
-			<div className = "meta">{ctx}</div>
 		</div>
 	)
 }
@@ -416,8 +634,7 @@ function Buttons(){
 		</div>
 	)
 }
-
-var rootNode = document.getElementById("app")
+let rootNode = document.getElementById("app")
 ReactDOM.render(
 <React.StrictMode>
 <App/>
